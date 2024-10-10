@@ -65,7 +65,8 @@ defmodule Communer.MixProject do
       {:bandit, "~> 1.5"},
       {:tentacat, "~> 2.4"},
       {:hex_core, "~> 0.10.3"},
-      {:igniter, "~> 0.3.52"}
+      {:igniter, "~> 0.3.52"},
+      {:req, "~> 0.5.6"}
     ]
   end
 

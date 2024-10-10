@@ -1,5 +1,8 @@
 defmodule Communer.Ecosystem.Package do
-  use Ash.Resource, domain: Communer.Ecosystem, data_layer: AshPostgres.DataLayer
+  use Ash.Resource,
+  domain: Communer.Ecosystem,
+  data_layer: AshPostgres.DataLayer,
+  notifiers: [Ash.Notifier.PubSub]
 
   actions do
     defaults [:read, :create, :update, :destroy]
@@ -8,6 +11,15 @@ defmodule Communer.Ecosystem.Package do
   postgres do
     table "packages"
     repo Communer.Repo
+  end
+
+  code_interface do
+    define :create, args: [:name, :latest_version]
+  end
+
+  pub_sub do
+    module CommunerWeb.Endpoint
+    publish :create, ["package_created"]
   end
 
   attributes do

@@ -3,7 +3,7 @@ defmodule Communer.Githubber do
   require Logger
 
   def start_link(_) do
-    GenServer.start_link(Nervespub.Githubber, nil, name: Nervespub.Githubber)
+    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
   @impl GenServer

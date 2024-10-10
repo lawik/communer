@@ -14,6 +14,8 @@ defmodule Communer.Application do
       {Phoenix.PubSub, name: Communer.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: Communer.Finch},
+      Communer.Githubber,
+      Communer.Hexer,
       # Start a worker by calling: Communer.Worker.start_link(arg)
       # {Communer.Worker, arg},
       # Start to serve requests, typically the last entry

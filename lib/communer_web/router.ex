@@ -1,6 +1,8 @@
 defmodule CommunerWeb.Router do
   use CommunerWeb, :router
 
+  import AshAdmin.Router
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -14,10 +16,15 @@ defmodule CommunerWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", CommunerWeb do
+  scope "/" do
     pipe_through :browser
 
-    get "/", PageController, :home
+    ash_admin "/admin"
+  end
+
+  scope "/", CommunerWeb do
+    pipe_through :browser
+    live "/", HomeLive
   end
 
   # Other scopes may use custom stacks.
