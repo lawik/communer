@@ -32,6 +32,9 @@ defmodule Communer.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:ash_admin, "~> 0.11"},
+      {:ash_phoenix, "~> 2.0"},
+      {:ash_postgres, "~> 2.0"},
       {:ash, "~> 3.0"},
       {:phoenix, "~> 1.7.14"},
       {:phoenix_ecto, "~> 4.5"},
@@ -77,14 +80,15 @@ defmodule Communer.MixProject do
       setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      test: ["ash.setup --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["tailwind communer", "esbuild communer"],
       "assets.deploy": [
         "tailwind communer --minify",
         "esbuild communer --minify",
         "phx.digest"
-      ]
+      ],
+      "ash.setup": ["ash.setup", "run priv/repo/seeds.exs"]
     ]
   end
 end

@@ -36,19 +36,23 @@ defmodule Communer.Githubber do
   @impl GenServer
   def handle_info(:run, %{requests: [{mfa, callback} | tail], rate_limit: rate_limit} = state) do
     Logger.info("Running Github request: #{inspect(mfa)}")
+
     if rate_limit.remaining > 0 or DateTime.compare(rate_limit.reset, DateTime.utc_now()) == :lt do
       {module, function, arguments} = mfa
-      state = case request(module, function, [state.client | arguments]) do
-        {:error, :skip} ->
-          schedule_run(1)
-          %{state | requests: tail}
-        {:ok, result, limit} ->
-          Logger.info("Processing GitHub response...")
-          callback.(result)
-          Logger.info("GitHub callback completed.")
-          schedule_run(1)
-          %{state | rate_limit: limit, requests: tail}
-      end
+
+      state =
+        case request(module, function, [state.client | arguments]) do
+          {:error, :skip} ->
+            schedule_run(1)
+            %{state | requests: tail}
+
+          {:ok, result, limit} ->
+            Logger.info("Processing GitHub response...")
+            callback.(result)
+            Logger.info("GitHub callback completed.")
+            schedule_run(1)
+            %{state | rate_limit: limit, requests: tail}
+        end
 
       schedule_run(1)
       {:noreply, state}
@@ -62,10 +66,12 @@ defmodule Communer.Githubber do
 
   defp request(module, function, arguments) do
     {status, result, response} = apply(module, function, arguments)
+
     case status do
       200 ->
         rate_limits = get_rate_limit(response)
         {:ok, result, rate_limits}
+
       _ ->
         Logger.error("Received a #{status} status from GitHub")
         Logger.debug("Response: #{inspect(response)}")
@@ -74,9 +80,10 @@ defmodule Communer.Githubber do
   end
 
   defp get_rate_limit(response) do
-    mapped = response.headers
-    |> Enum.filter(& String.starts_with?(elem(&1, 0), "X-RateLimit"))
-    |> Enum.into(%{})
+    mapped =
+      response.headers
+      |> Enum.filter(&String.starts_with?(elem(&1, 0), "X-RateLimit"))
+      |> Enum.into(%{})
 
     %{
       "X-RateLimit-Limit" => limit,
